@@ -28,20 +28,19 @@ def decode_to_text(morse_code):
             text += code
     return text
 
+def is_morsecode(input_str):
+    return all(char in '-. ' for char in input_str)
+
 def main():
     while True:
-        choice = input("Wil je tekst naar morsecode omzetten (1) of morsecode naar tekst (2)? ")
-        
-        if choice == '1':
-            text = input("Voer de tekst in die je naar morsecode wilt omzetten: ")
-            morse_code = encode_to_morse(text)
-            print("Morsecode:", morse_code)
-        elif choice == '2':
-            morse_code = input("Voer de morsecode in die je naar tekst wilt omzetten: ")
-            text = decode_to_text(morse_code)
+        user_input = input("Voer de tekst of Morsecode in die je wilt converteren: ")
+
+        if is_morsecode(user_input):
+            text = decode_to_text(user_input)
             print("Tekst:", text)
         else:
-            print("Ongeldige keuze. Probeer opnieuw.")
+            morse_code = encode_to_morse(user_input)
+            print("Morsecode:", morse_code)
 
         cont = input("Wil je nog een vertaling doen? (ja/nee) ").lower()
         if cont != 'ja':
