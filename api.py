@@ -38,6 +38,7 @@ def is_morsecode(input_str):
 @app.route('/api/convert', methods=['POST'])
 def convert():
     data = request.json
+    print("hoi")
     user_input = data.get('input')
     if is_morsecode(user_input):
         text = decode_to_text(user_input)
@@ -45,6 +46,7 @@ def convert():
     else:
         morse_code = encode_to_morse(user_input)
         result = {"result": "Morsecode", "output": morse_code}
+    print(result)
     return jsonify(result)
 
 if __name__ == "__main__":
