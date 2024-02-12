@@ -1,3 +1,7 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
 MORSE_CODE_DICT = {
     'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---',
     'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-',
@@ -31,20 +35,17 @@ def decode_to_text(morse_code):
 def is_morsecode(input_str):
     return all(char in '-. ' for char in input_str)
 
-def main():
-    while True:
-        user_input = input("Voer de tekst of Morsecode in die je wilt converteren: ")
-
-        if is_morsecode(user_input):
-            text = decode_to_text(user_input)
-            print("Tekst:", text)
-        else:
-            morse_code = encode_to_morse(user_input)
-            print("Morsecode:", morse_code)
-
-        cont = input("Wil je nog een vertaling doen? (ja/nee) ").lower()
-        if cont != 'ja':
-            break
+@app.route('/api/convert', methods=['POST'])
+def convert():
+    data = request.json
+    user_input = data.get('input')
+    if is_morsecode(user_input):
+        text = decode_to_text(user_input)
+        result = {"result": "Tekst", "output": text}
+    else:
+        morse_code = encode_to_morse(user_input)
+        result = {"result": "Morsecode", "output": morse_code}
+    return jsonify(result)
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
