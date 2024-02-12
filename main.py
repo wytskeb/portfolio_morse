@@ -1,9 +1,12 @@
 import requests
 
+SLEUTEL = "abc123"
+
+
 def convert_morse_text(text):
     try:
         api_url = "http://localhost:5000/api/convert"
-        data = {"input": text}
+        data = {"input": text, "sleutel": SLEUTEL}
         response = requests.post(api_url, json=data)
         response.raise_for_status()  # Raises an error for bad response status (4xx or 5xx)
         result = response.json()
@@ -12,13 +15,34 @@ def convert_morse_text(text):
         print("Error:", e)
         return "ERROR"
 
+def check_api_key():
+    try:
+        api_url = "http://localhost:5000/api/convert"
+        data = {"sleutel": SLEUTEL, "input": "HOI"}
+        response = requests.post(api_url, json=data)
+        response.raise_for_status()  # Raises an error for bad response status (4xx or 5xx)
+        result = response.json()
+        if result.get("output") == ".... --- .. ":
+            return True
+        else:
+            return False
+    except requests.exceptions.RequestException as e:
+        print("Error:", e)
+        return False
+
 def main():
     while True:
-        text = input("Voer de tekst in die je naar Morsecode wilt omzetten: ")
+        text = input(
+            "Voer de tekst in die je naar Morsecode wilt omzetten of voer de Morsecode in: "
+        )
         output = convert_morse_text(text)
         print("Output:", output)
         if input("Wil je nog een vertaling doen? (ja/nee) ").lower() != "ja":
             break
 
+
 if __name__ == "__main__":
-    main()
+    if check_api_key():
+        main()
+    else:
+        print("De API sleutel komt niet overeen of de API is ziek. Probeer het opnieuw.")

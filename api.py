@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 
+SLOT = "abc123"
+
 app = Flask(__name__)
 
 MORSE_CODE_DICT = {
@@ -33,12 +35,13 @@ def decode_to_text(morse_code):
     return text
 
 def is_morsecode(input_str):
-    return all(char in '-. ' for char in input_str)
+    return all(char in '-. /' for char in input_str)
 
 @app.route('/api/convert', methods=['POST'])
 def convert():
     data = request.json
-    print("hoi")
+    if data.get('sleutel') != SLOT:
+        return jsonify({"result": "ERROR", "output": "Sleutel komt niet overeen"})
     user_input = data.get('input')
     if is_morsecode(user_input):
         text = decode_to_text(user_input)
@@ -46,7 +49,7 @@ def convert():
     else:
         morse_code = encode_to_morse(user_input)
         result = {"result": "Morsecode", "output": morse_code}
-    print(result)
+    #print(result)
     return jsonify(result)
 
 if __name__ == "__main__":
