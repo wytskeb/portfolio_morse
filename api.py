@@ -1,12 +1,13 @@
 from flask import Flask, request, jsonify
-
 import os
+import secrets
+
 from dotenv import load_dotenv
 
 ww = load_dotenv("ww-api.env")
 api_key = os.getenv("API_KEY")
 
-print (f"wachtwoord = {api_key}" )
+print (f"we beginnen met het wachtwoord: {api_key}" )
 
 app = Flask(__name__)
 
@@ -22,6 +23,24 @@ MORSE_CODE_DICT = {
 # Reverse the MORSE_CODE_DICT to create a dictionary for decoding
 REVERSE_MORSE_CODE_DICT = {value: key for key, value in MORSE_CODE_DICT.items()}
 
+
+class Tokens:
+
+    def __init__(self, tokens = []):
+        self.tokens = tokens
+
+    def add_token(self):
+        new_token = secrets.token_hex(4)
+        self.tokens.append(new_token)
+        return new_token
+
+    def list_tokens(self):
+        return self.tokens
+    
+    def check_token(self, token):
+        return token in self.tokens
+
+
 def encode_to_morse(text):
     morse_code = ''
     for char in text:
@@ -30,6 +49,7 @@ def encode_to_morse(text):
         else:
             morse_code += char + ' '
     return morse_code
+
 
 def decode_to_text(morse_code):
     text = ''
@@ -40,23 +60,40 @@ def decode_to_text(morse_code):
             text += code
     return text
 
+
 def is_morsecode(input_str):
     return all(char in '-. /' for char in input_str)
 
+
 @app.route('/api/convert', methods=['POST'])
 def convert():
+    global my_tokens
     data = request.json
-    if data.get('sleutel') != api_key:
-        return jsonify({"result": "ERROR", "output": "Sleutel komt niet overeen"})
-    user_input = data.get('input')
-    if is_morsecode(user_input):
-        text = decode_to_text(user_input)
-        result = {"result": "Tekst", "output": text}
+    if my_tokens.check_token(data.get('token')):
+        user_input = data.get('input')
+        if is_morsecode(user_input):
+            text = decode_to_text(user_input)
+            result = {"result": "Tekst", "output": text}
+        else:
+            morse_code = encode_to_morse(user_input)
+            result = {"result": "Morsecode", "output": morse_code}
+        return jsonify(result)
     else:
-        morse_code = encode_to_morse(user_input)
-        result = {"result": "Morsecode", "output": morse_code}
-    #print(result)
-    return jsonify(result)
+        return jsonify({"result": "ERROR", "output": "Token komt niet overeen"})
+
+@app.route('/api/generate_token', methods=['GET'])
+def generate_token():
+    global my_tokens
+    global api_key
+    if request.args.get('sleutel') == api_key:
+        # Verstuur het wachtwoord naar de frontend
+        token = my_tokens.add_token()
+        print(f"Nieuw token: {token}")
+        return jsonify({"token": token}), 200
+    else:
+        return jsonify({"result": "ERROR", "output": "Sleutel komt niet overeen"}), 401
+
 
 if __name__ == "__main__":
+    my_tokens = Tokens()
     app.run(debug=True)
