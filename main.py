@@ -64,16 +64,3 @@ if __name__ == "__main__":
 
     else:
         print("De API is ziek. Probeer het opnieuw.")
-
-    
-
-
-
-
-
-    if check_api_key():
-        main_key = generate_password()
-        print(main_key)
-        main()
-    else:
-        print("De API sleutel komt niet overeen of de API is ziek. Probeer het opnieuw.")
