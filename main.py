@@ -1,12 +1,17 @@
 import requests
+import os
+from dotenv import load_dotenv
 
-SLEUTEL = "abc123"
+ww = load_dotenv( "ww-main.env")
+main_key = os.getenv("MAIN_KEY")
+
+print (f"wachtwoord = {main_key}" )
 
 
 def convert_morse_text(text):
     try:
         api_url = "http://localhost:5000/api/convert"
-        data = {"input": text, "sleutel": SLEUTEL}
+        data = {"input": text, "sleutel": main_key}
         response = requests.post(api_url, json=data)
         response.raise_for_status()  # Raises an error for bad response status (4xx or 5xx)
         result = response.json()
@@ -18,7 +23,7 @@ def convert_morse_text(text):
 def check_api_key():
     try:
         api_url = "http://localhost:5000/api/convert"
-        data = {"sleutel": SLEUTEL, "input": "HOI"}
+        data = {"sleutel": main_key, "input": "HOI"}
         response = requests.post(api_url, json=data)
         response.raise_for_status()  # Raises an error for bad response status (4xx or 5xx)
         result = response.json()

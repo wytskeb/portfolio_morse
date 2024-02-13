@@ -1,6 +1,12 @@
 from flask import Flask, request, jsonify
 
-SLOT = "abc123"
+import os
+from dotenv import load_dotenv
+
+ww = load_dotenv("ww-api.env")
+api_key = os.getenv("API_KEY")
+
+print (f"wachtwoord = {api_key}" )
 
 app = Flask(__name__)
 
@@ -40,7 +46,7 @@ def is_morsecode(input_str):
 @app.route('/api/convert', methods=['POST'])
 def convert():
     data = request.json
-    if data.get('sleutel') != SLOT:
+    if data.get('sleutel') != api_key:
         return jsonify({"result": "ERROR", "output": "Sleutel komt niet overeen"})
     user_input = data.get('input')
     if is_morsecode(user_input):
