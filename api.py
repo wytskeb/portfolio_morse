@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import os
-import secrets
+
+from tokens import Tokens
 
 from dotenv import load_dotenv
 
@@ -22,23 +23,6 @@ MORSE_CODE_DICT = {
 
 # Reverse the MORSE_CODE_DICT to create a dictionary for decoding
 REVERSE_MORSE_CODE_DICT = {value: key for key, value in MORSE_CODE_DICT.items()}
-
-
-class Tokens:
-
-    def __init__(self, tokens = []):
-        self.tokens = tokens
-
-    def add_token(self):
-        new_token = secrets.token_hex(4)
-        self.tokens.append(new_token)
-        return new_token
-
-    def list_tokens(self):
-        return self.tokens
-    
-    def check_token(self, token):
-        return token in self.tokens
 
 
 def encode_to_morse(text):
@@ -89,6 +73,7 @@ def generate_token():
         # Verstuur het wachtwoord naar de frontend
         token = my_tokens.add_token()
         print(f"Nieuw token: {token}")
+        print(f"Token lijst: {my_tokens.list_tokens()}")
         return jsonify({"token": token}), 200
     else:
         return jsonify({"result": "ERROR", "output": "Sleutel komt niet overeen"}), 401
