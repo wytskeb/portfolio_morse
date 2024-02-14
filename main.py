@@ -25,6 +25,7 @@ def check_api_key(main_key):
         response = requests.get("http://localhost:5000/api/generate_token?sleutel=" + main_key)
         response.raise_for_status()  # Raises an error for bad response status (4xx or 5xx)
         result = response.json()
+        
         if result.get("token") is not None:
             return result["token"]
         else:

@@ -73,7 +73,7 @@ def generate_token():
         # Verstuur het wachtwoord naar de frontend
         token = my_tokens.add_token()
         print(f"Nieuw token: {token}")
-        print(f"Token lijst: {my_tokens.list_tokens()}")
+        print(f"Token lijst: {my_tokens.dict_tokens()}")
         return jsonify({"token": token}), 200
     else:
         return jsonify({"result": "ERROR", "output": "Sleutel komt niet overeen"}), 401
