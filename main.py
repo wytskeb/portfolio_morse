@@ -9,29 +9,33 @@ print (f"We beginnen met hetwachtwoord = {main_key}" )
 
 
 def convert_morse_text(text, token):
-    try:
-        api_url = "http://localhost:5000/api/convert"
-        data = {"input": text, "token": token}
-        response = requests.post(api_url, json=data)
-        response.raise_for_status()  # Raises an error for bad response status (4xx or 5xx)
+    #try:
+    api_url = "http://localhost:5000/api/convert"
+    data = {"input": text, "token": token}
+    response = requests.post(api_url, json=data)
+    #response.raise_for_status()  # Raises an error for bad response status (4xx or 5xx)
+    if response.status_code == 200:    
         result = response.json()
         return result["output"]
-    except requests.exceptions.RequestException as e:
-        print("Error:", e)
+    elif response.status_code == 401:
+        return "AUTH_ERROR"
+    else:
         return "ERROR"
+    #except requests.exceptions.RequestException as e:
+    #    print("Error:", e)
+    #    return "ERROR"
 
 def check_api_key(main_key):
     try:
         response = requests.get("http://localhost:5000/api/generate_token?sleutel=" + main_key)
         response.raise_for_status()  # Raises an error for bad response status (4xx or 5xx)
         result = response.json()
-        
         if result.get("token") is not None:
             return result["token"]
         else:
             return "notoken"
     except requests.exceptions.RequestException as e:
-        print("Error:", e)
+        #print("Error:", e)
         return "notoken"
 
 
@@ -52,15 +56,22 @@ def generate_password():
 if __name__ == "__main__":
     # token ophalen
     token = check_api_key(main_key)
-    print(token)
     if token != "notoken":
         while True:
             text = input(
                 "Voer de tekst in die je naar Morsecode wilt omzetten of voer de Morsecode in: "
             )
             output = convert_morse_text(text, token)
-            print("Output:", output)
-            if input("Wil je nog een vertaling doen? (ja/nee) ").lower() != "ja":
+            if output == "AUTH_ERROR":
+                print("> Ik haal even een nieuw token voor je op...")
+                token = check_api_key(main_key)
+                if token == "notoken":
+                    print("ERROR: kan API token niet vernieuwen.")
+                    quit()
+                else:
+                    output = convert_morse_text(text, token)
+            print(f"Output: {output}")
+            if input("Wil je nog een vertaling doen? (j/n) ").lower() == "n":
                 break
 
     else:

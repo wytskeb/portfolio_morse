@@ -53,7 +53,7 @@ def is_morsecode(input_str):
 def convert():
     global my_tokens
     data = request.json
-    if my_tokens.check_token(data.get('token')):
+    if my_tokens.check_token(data.get('token')) and my_tokens.check_time(data.get('token')):
         user_input = data.get('input')
         if is_morsecode(user_input):
             text = decode_to_text(user_input)
@@ -63,7 +63,7 @@ def convert():
             result = {"result": "Morsecode", "output": morse_code}
         return jsonify(result)
     else:
-        return jsonify({"result": "ERROR", "output": "Token komt niet overeen"})
+        return jsonify({"result": "ERROR", "output": "Token verlopen!"}), 401
 
 @app.route('/api/generate_token', methods=['GET'])
 def generate_token():
@@ -73,6 +73,7 @@ def generate_token():
         # Verstuur het wachtwoord naar de frontend
         token = my_tokens.add_token()
         print(f"Nieuw token: {token}")
+        print(f"nieuw tijd: {my_tokens.tokens[token]}")
         print(f"Token lijst: {my_tokens.dict_tokens()}")
         return jsonify({"token": token}), 200
     else:
