@@ -5,19 +5,18 @@ tokens.py
 
 This module contains the Tokens class and the global variable my_tokens
 """
-import secrets
+import random
+import string
 from datetime import datetime
 
 class Tokens:
     """
     This class is responsible for the creation and checking of API tokens
     """
-    # tokens = {token: timestamp, token: timestamp, ...}
-    def __init__(self, tokens = None):
+    def __init__(self, tokens=None):
         if tokens is None:
             tokens = {}
         self.tokens = tokens
-
 
     def add_token(self):
         """
@@ -26,11 +25,10 @@ class Tokens:
         Returns:
             str: the new token
         """
-        new_token = secrets.token_hex(4)
+        new_token = self._generate_token()
         self.tokens[new_token] = datetime.timestamp(datetime.now()) + 5
         print(f"Token toegevoegd: {self.tokens[new_token]}")
         return new_token
-
 
     def dict_tokens(self):
         """
@@ -38,13 +36,11 @@ class Tokens:
         """
         return self.tokens
 
-
     def check_token(self, token):
         """
         Check if the given token is in the tokens dictionary.
         """
         return token in self.tokens
-
 
     def check_time(self, token):
         """
@@ -65,3 +61,17 @@ class Tokens:
             if t[token] < datetime.timestamp(datetime.now()):
                 self.tokens.pop(token)
                 print(f"Verwijderd token: {token}")
+
+    @staticmethod
+    def _generate_token(length=8):
+        """
+        Generate a random token.
+
+        Parameters:
+            length (int): The length of the token.
+
+        Returns:
+            str: The randomly generated token.
+        """
+        characters = string.ascii_letters + string.digits
+        return ''.join(random.choice(characters) for _ in range(length))
