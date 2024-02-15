@@ -72,6 +72,7 @@ def convert():
         else:
             morse_code = encode_to_morse(user_input)
             result = {"result": "Morsecode", "output": morse_code}
+        my_tokens.cleanup_tokens()
         return jsonify(result)
     return jsonify({"result": "ERROR", "output": "Token verlopen!"}), 401
 
@@ -89,5 +90,4 @@ def generate_token():
 
 
 if __name__ == "__main__":
-    my_tokens = Tokens()
     app.run(debug=True)
